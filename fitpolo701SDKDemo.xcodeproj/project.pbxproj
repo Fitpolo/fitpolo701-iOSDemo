@@ -1,0 +1,329 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00BCFCD820B4F56C000B7640 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 00BCFCD720B4F56C000B7640 /* AppDelegate.m */; };
+		00BCFCDB20B4F56C000B7640 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00BCFCDA20B4F56C000B7640 /* ViewController.m */; };
+		00BCFCDE20B4F56C000B7640 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00BCFCDC20B4F56C000B7640 /* Main.storyboard */; };
+		00BCFCE020B4F56C000B7640 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00BCFCDF20B4F56C000B7640 /* Assets.xcassets */; };
+		00BCFCE320B4F56C000B7640 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00BCFCE120B4F56C000B7640 /* LaunchScreen.storyboard */; };
+		00BCFCE620B4F56C000B7640 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 00BCFCE520B4F56C000B7640 /* main.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00BCFCD320B4F56C000B7640 /* fitpolo701SDKDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = fitpolo701SDKDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		00BCFCD620B4F56C000B7640 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		00BCFCD720B4F56C000B7640 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		00BCFCD920B4F56C000B7640 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		00BCFCDA20B4F56C000B7640 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		00BCFCDD20B4F56C000B7640 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		00BCFCDF20B4F56C000B7640 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		00BCFCE220B4F56C000B7640 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		00BCFCE420B4F56C000B7640 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		00BCFCE520B4F56C000B7640 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		00BCFCD020B4F56C000B7640 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00BCFCCA20B4F56C000B7640 = {
+			isa = PBXGroup;
+			children = (
+				00BCFCD520B4F56C000B7640 /* fitpolo701SDKDemo */,
+				00BCFCD420B4F56C000B7640 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		00BCFCD420B4F56C000B7640 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				00BCFCD320B4F56C000B7640 /* fitpolo701SDKDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		00BCFCD520B4F56C000B7640 /* fitpolo701SDKDemo */ = {
+			isa = PBXGroup;
+			children = (
+				00BCFCD620B4F56C000B7640 /* AppDelegate.h */,
+				00BCFCD720B4F56C000B7640 /* AppDelegate.m */,
+				00BCFCD920B4F56C000B7640 /* ViewController.h */,
+				00BCFCDA20B4F56C000B7640 /* ViewController.m */,
+				00BCFCDC20B4F56C000B7640 /* Main.storyboard */,
+				00BCFCDF20B4F56C000B7640 /* Assets.xcassets */,
+				00BCFCE120B4F56C000B7640 /* LaunchScreen.storyboard */,
+				00BCFCE420B4F56C000B7640 /* Info.plist */,
+				00BCFCE520B4F56C000B7640 /* main.m */,
+			);
+			path = fitpolo701SDKDemo;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		00BCFCD220B4F56C000B7640 /* fitpolo701SDKDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00BCFCE920B4F56C000B7640 /* Build configuration list for PBXNativeTarget "fitpolo701SDKDemo" */;
+			buildPhases = (
+				00BCFCCF20B4F56C000B7640 /* Sources */,
+				00BCFCD020B4F56C000B7640 /* Frameworks */,
+				00BCFCD120B4F56C000B7640 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = fitpolo701SDKDemo;
+			productName = fitpolo701SDKDemo;
+			productReference = 00BCFCD320B4F56C000B7640 /* fitpolo701SDKDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		00BCFCCB20B4F56C000B7640 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = HCK;
+				TargetAttributes = {
+					00BCFCD220B4F56C000B7640 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 00BCFCCE20B4F56C000B7640 /* Build configuration list for PBXProject "fitpolo701SDKDemo" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 00BCFCCA20B4F56C000B7640;
+			productRefGroup = 00BCFCD420B4F56C000B7640 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				00BCFCD220B4F56C000B7640 /* fitpolo701SDKDemo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		00BCFCD120B4F56C000B7640 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00BCFCE320B4F56C000B7640 /* LaunchScreen.storyboard in Resources */,
+				00BCFCE020B4F56C000B7640 /* Assets.xcassets in Resources */,
+				00BCFCDE20B4F56C000B7640 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		00BCFCCF20B4F56C000B7640 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00BCFCDB20B4F56C000B7640 /* ViewController.m in Sources */,
+				00BCFCE620B4F56C000B7640 /* main.m in Sources */,
+				00BCFCD820B4F56C000B7640 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		00BCFCDC20B4F56C000B7640 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				00BCFCDD20B4F56C000B7640 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		00BCFCE120B4F56C000B7640 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				00BCFCE220B4F56C000B7640 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		00BCFCE720B4F56C000B7640 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		00BCFCE820B4F56C000B7640 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		00BCFCEA20B4F56C000B7640 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TYTPVLJ5LD;
+				INFOPLIST_FILE = fitpolo701SDKDemo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.moko.fitpolo701SDKDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		00BCFCEB20B4F56C000B7640 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TYTPVLJ5LD;
+				INFOPLIST_FILE = fitpolo701SDKDemo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.moko.fitpolo701SDKDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		00BCFCCE20B4F56C000B7640 /* Build configuration list for PBXProject "fitpolo701SDKDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00BCFCE720B4F56C000B7640 /* Debug */,
+				00BCFCE820B4F56C000B7640 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00BCFCE920B4F56C000B7640 /* Build configuration list for PBXNativeTarget "fitpolo701SDKDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00BCFCEA20B4F56C000B7640 /* Debug */,
+				00BCFCEB20B4F56C000B7640 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 00BCFCCB20B4F56C000B7640 /* Project object */;
+}
