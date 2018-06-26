@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  HCKMainViewController.h
 //  fitpolo701SDKDemo
 //
 //  Created by aa on 2018/5/23.
@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
-
+@interface HCKMainViewController : UIViewController
 
 @end
-
