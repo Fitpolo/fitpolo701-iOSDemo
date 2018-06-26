@@ -1,12 +1,13 @@
 //
 //  AppDelegate.m
-//  fitpolo701SDKDemo
+//  testFitpolo701SDK
 //
-//  Created by aa on 2018/5/23.
+//  Created by aa on 2018/3/20.
 //  Copyright © 2018年 HCK. All rights reserved.
 //
 
 #import "AppDelegate.h"
+#import "HCKMainViewController.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,12 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    _window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    _window.backgroundColor = [UIColor whiteColor];
+    HCKMainViewController *vc = [[HCKMainViewController alloc] init];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    _window.rootViewController = nav;
+    [_window makeKeyAndVisible];
     return YES;
 }
 
@@ -49,3 +56,4 @@
 
 
 @end
+
