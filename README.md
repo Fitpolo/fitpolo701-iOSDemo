@@ -53,6 +53,6 @@
 
 #### 3.数据接口调用
 fitpolo701Interface包含了所有的数据接口部分，所有接口采用block形式回调。
-```fitpolo705Interface.h```里面包含了所有的设置手环参数的接口，```fitpolo701Interface+RequestData.h```里面包含了所有的11请求手环数据的接口，```fitpolo701Interface+Update```包含了固件升级相关接口
+```fitpolo705Interface.h```里面包含了所有的设置手环参数的接口，```fitpolo701Interface+RequestData.h```里面包含了所有的请求手环数据的接口，```fitpolo701Interface+Update```包含了固件升级相关接口
 
 
