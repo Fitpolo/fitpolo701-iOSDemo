@@ -6,10 +6,14 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/Fitpolo/fitpolo701-iOSDemo/tree/master"      #项目主页，不是git地址
   s.license      = { :type => "MIT", :file => "LICENSE" }   #开源协议
   s.author             = { "Chengang" => "chengang@mokotechnology.com" }  #作者
-  s.platform     = :ios, "8.0"                  #支持的平台和版本号
+  s.platform     = :ios, "9.0"                  #支持的平台和版本号
+  s.ios.deployment_target = "9.0"
+  s.frameworks   = "UIKit", "Foundation" #支持的框架
   s.source       = { :git => "https://github.com/Fitpolo/fitpolo701-iOSDemo.git", :tag => "1.0.0" }         #存储库的git地址，以及tag值
-  #s.source_files  =  "RepositoryDemonstration/Other/**/*.{h,m}" #需要托管的源代码路径
   s.requires_arc = true #是否支持ARC
+
+  s.source_files = "fitpolo701SDK/**/*"
+
   #s.dependency "Masonry", "~> 1.0.0"    #所依赖的第三方库，没有就不用写
 
 end
