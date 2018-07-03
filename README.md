@@ -1,5 +1,6 @@
 # fitpolo701-iOSDemo
 
+支持pod，pod 'fitpolo701SDK'
 #### 1.扫描
 ```
 #import "fitpolo701SDK.h"
