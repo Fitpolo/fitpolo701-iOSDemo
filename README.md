@@ -46,6 +46,7 @@
 
 #### 2.连接设备
 ##### 2.1 中心蓝牙状态改变和外设连接状态改变
+```
 [fitpolo701CentralManager sharedInstance].managerStateDelegate = self;
 #pragma mark - fitpolo701CentralManagerStateDelegate
 /**
@@ -67,7 +68,7 @@
 - (void)fitpolo701PeripheralConnectStateChanged:(fitpolo701ConnectStatus)connectState manager:(fitpolo701CentralManager *)manager{
     NSLog(@"当前连接状态:%@",@(connectState));
 }
-
+```
 ##### 2.2 通过identifier来连接设备
 
 ```
