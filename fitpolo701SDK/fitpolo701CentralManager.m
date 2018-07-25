@@ -446,6 +446,7 @@ static dispatch_once_t onceToken;
     [self.centralManager cancelPeripheralConnection:self.connectedPeripheral];
     self.connectedPeripheral = nil;
     self.managerAction = currentManagerActionDefault;
+    [self updateManagerStateConnectState:fitpolo701ConnectStatusDisconnect];
 }
 
 #pragma mark - task
