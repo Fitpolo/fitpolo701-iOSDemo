@@ -7,10 +7,8 @@
 //
 
 #import "fitpolo701Interface+RequestData.h"
-#import "fitpolo701PeripheralManager.h"
-#import "fitpolo701RegularsDefine.h"
+#import "fitpolo701Defines.h"
 #import "fitpolo701Parser.h"
-#import "fitpolo701CentralManager.h"
 
 @implementation fitpolo701Interface (RequestData)
 
@@ -27,7 +25,7 @@
     [self requestPeripheralMemoryDataWithSucBlock:^(id returnData) {
         NSString *battery = returnData[@"result"][@"battery"];
         if (!fitpolo701ValidStr(battery)) {
-            fitpolo701RequestPeripheralDataError(failedBlock);
+            [fitpolo701Parser operationRequestDataErrorBlock:failedBlock];
             return ;
         }
         NSDictionary *resultDic = @{
@@ -135,7 +133,7 @@
     [self requestPeripheralDataWithDate:date dataType:fitpolo701RequestSleepIndexDataWithTimeStamp sucBlock:^(id sleepIndexData) {
         NSArray *indexList = sleepIndexData[@"result"];
         if (!indexList) {
-            fitpolo701RequestPeripheralDataError(failedBlock);
+            [fitpolo701Parser operationRequestDataErrorBlock:failedBlock];
             return;
         }
         if (indexList.count == 0) {
@@ -153,12 +151,12 @@
         [weakSelf requestPeripheralDataWithDate:date dataType:fitpolo701RequestSleepRecordDataWithTimeStamp sucBlock:^(id sleepRecordData) {
             NSArray *recordList = sleepRecordData[@"result"];
             if (!fitpolo701ValidArray(recordList)) {
-                fitpolo701RequestPeripheralDataError(failedBlock);
+                [fitpolo701Parser operationRequestDataErrorBlock:failedBlock];
                 return;
             }
             NSArray *sleepList = [fitpolo701Parser getSleepDataList:indexList recordList:recordList];
             if (!fitpolo701ValidArray(sleepList)) {
-                fitpolo701RequestPeripheralDataError(failedBlock);
+                [fitpolo701Parser operationRequestDataErrorBlock:failedBlock];
                 return;
             }
             NSDictionary *resultDic = @{@"msg":@"success",
@@ -217,8 +215,7 @@
 + (void)requestPeripheralAlarmClockDataWithSucBlock:(fitpolo701CommunicationSuccessBlock)successBlock
                                           failBlock:(fitpolo701CommunicationFailedBlock)failedBlock{
     NSString *commandString = @"b001";
-    fitpolo701PeripheralManager *manager = [fitpolo701CentralManager sharedInstance].peripheralManager;
-    [manager addNeedResetNumTaskWithTaskID:fitpolo701GetAlarmClockDataOperation number:2 commandData:commandString successBlock:^(id returnData) {
+    [[fitpolo701CentralManager sharedInstance] addNeedResetNumTaskWithTaskID:fitpolo701GetAlarmClockDataOperation number:2 commandData:commandString successBlock:^(id returnData) {
         NSMutableArray *list = [NSMutableArray array];
         for (NSDictionary *dic in returnData[@"result"]) {
             NSArray *tempList = dic[@"clockList"];
@@ -273,12 +270,11 @@
         commandString:(NSString *)commandString
              sucBlock:(fitpolo701CommunicationSuccessBlock)successBlock
             failBlock:(fitpolo701CommunicationFailedBlock)failedBlock{
-    fitpolo701PeripheralManager *manager = [fitpolo701CentralManager sharedInstance].peripheralManager;
-    [manager addTaskWithTaskID:taskID
-                      resetNum:NO
-                   commandData:commandString
-                  successBlock:successBlock
-                  failureBlock:failedBlock];
+    [[fitpolo701CentralManager sharedInstance] addTaskWithTaskID:taskID
+                                                        resetNum:NO
+                                                     commandData:commandString
+                                                    successBlock:successBlock
+                                                    failureBlock:failedBlock];
 }
 
 /**
@@ -310,7 +306,7 @@
                             failBlock:(fitpolo701CommunicationFailedBlock)failedBlock{
     NSString *hexTime = [fitpolo701Parser getTimeStringWithDate:date];
     if (!fitpolo701ValidStr(hexTime)) {
-        fitpolo701ParamsError(failedBlock);
+        [fitpolo701Parser operationParamsErrorBlock:failedBlock];
         return;
     }
     //默认是计步
@@ -330,11 +326,10 @@
         operationID = fitpolo701GetHeartDataOperation;
     }
     NSString *commandString = [NSString stringWithFormat:@"%@%@%@",@"2c",hexTime,function];
-    fitpolo701PeripheralManager *manager = [fitpolo701CentralManager sharedInstance].peripheralManager;
-    [manager addNeedPartOfDataTaskWithTaskID:operationID
-                                 commandData:commandString
-                                successBlock:successBlock
-                                failureBlock:failedBlock];
+    [[fitpolo701CentralManager sharedInstance] addNeedPartOfDataTaskWithTaskID:operationID
+                                                                   commandData:commandString
+                                                                  successBlock:successBlock
+                                                                  failureBlock:failedBlock];
 }
 
 @end

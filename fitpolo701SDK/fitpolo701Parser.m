@@ -7,15 +7,127 @@
 //
 
 #import "fitpolo701Parser.h"
-#import "fitpolo701RegularsDefine.h"
-#import "fitpolo701AncsModel.h"
-#import "fitpolo701ScreenDisplayModel.h"
+#import "fitpolo701Defines.h"
 #import "fitpolo701LogManager.h"
-#import "fitpolo701ScanModel.h"
 
 static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$";
+static NSString * const fitpolo701CustomErrorDomain = @"com.moko.fitpoloBluetoothSDK";
 
 @implementation fitpolo701Parser
+
+#pragma mark - blocks
++ (NSError *)getErrorWithCode:(fitpolo701CustomErrorCode)code message:(NSString *)message{
+    NSError *error = [[NSError alloc] initWithDomain:fitpolo701CustomErrorDomain
+                                                code:code
+                                            userInfo:@{@"errorInfo":message}];
+    return error;
+}
+
++ (void)operationCentralBlePowerOffBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701BlueDisable message:@"mobile phone bluetooth is currently unavailable"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationConnectFailedBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701ConnectedFailed message:@"connect failed"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationDisconnectedErrorBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701PeripheralDisconnected message:@"the current connection device is in disconnect"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationCharacteristicErrorBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701CharacteristicError message:@"characteristic error"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationRequestDataErrorBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701RequestPeripheralDataError message:@"request bracelet data error"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationParamsErrorBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701ParamsError message:@"input parameter error"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationSetParamsErrorBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701SetParamsError message:@"set parameter error"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationGetPackageDataErrorBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701GetPackageError message:@"get package error"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationUpdateErrorBlock:(void (^)(NSError *error))block{
+    fitpolo701_main_safe(^{
+        if (block) {
+            NSError *error = [self getErrorWithCode:fitpolo701UpdateError message:@"update failed"];
+            block(error);
+        }
+    });
+}
+
++ (void)operationSetParamsResult:(id)returnData
+                        sucBlock:(void (^)(id returnData))sucBlock
+                     failedBlock:(void (^)(NSError *error))failedBlock{
+    if (!fitpolo701ValidDict(returnData)) {
+        [self operationSetParamsErrorBlock:failedBlock];
+        return;
+    }
+    BOOL resultStatus = [returnData[@"result"][@"result"] boolValue];
+    if (!resultStatus) {
+        [self operationSetParamsErrorBlock:failedBlock];
+        return ;
+    }
+    NSDictionary *resultDic = @{@"msg":@"success",
+                                @"code":@"1",
+                                @"result":@{},
+                                };
+    fitpolo701_main_safe(^{
+        if (sucBlock) {
+            sucBlock(resultDic);
+        }
+    });
+}
+
+#pragma mark - parser
 
 + (NSInteger)getDecimalWithHex:(NSString *)content range:(NSRange)range{
     if (!fitpolo701ValidStr(content)) {
@@ -94,7 +206,7 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
     if (!ancsModel) {
         return nil;
     }
-    //短信、电话、微信、qq、whatsapp、facebook、twitter、skype、snapchat
+    //短信、电话、微信、qq、whatsapp、facebook、twitter、skype、snapchat、line
     unsigned long lowByte = 0;
     unsigned long highByte = 0;
     if (ancsModel.openSMS) lowByte |= 0x01;
@@ -106,6 +218,7 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
     if (ancsModel.openTwitter) lowByte |= 0x40;
     if (ancsModel.openSkype) lowByte |= 0x80;
     if (ancsModel.openSnapchat) highByte |= 0x01;
+    if (ancsModel.openLine) highByte |= 0x02;
     NSString *lowString = [[NSString alloc] initWithFormat:@"%1lx",lowByte];
     if (lowString.length == 1) {
         lowString = [@"0" stringByAppendingString:lowString];
@@ -123,6 +236,7 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
     //短信、电话、微信、、、、、、
     fitpolo701AncsModel *model = [[fitpolo701AncsModel alloc] init];
     model.openSnapchat = ((high & 0x01) == 0x01);
+    model.openLine = ((high & 0x02) == 0x02);
     model.openSkype = ((low & 0x80) == 0x80);
     model.openTwitter = ((low & 0x40) == 0x40);
     model.openFacebook = ((low & 0x20) == 0x20);
@@ -140,14 +254,14 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
             return @"00";
         case fitpolo701AlarmClockDrink:
             return @"01";
+        case fitpolo701AlarmClockNormal:
+            return @"03";
         case fitpolo701AlarmClockSleep:
             return @"04";
         case fitpolo701AlarmClockExcise:
             return @"05";
         case fitpolo701AlarmClockSport:
             return @"06";
-        case fitpolo701AlarmClockNormal:
-            return @"03";
     }
 }
 + (NSString *)getAlarlClockSetInfo:(fitpolo701StatusModel *)statusModel isOn:(BOOL)isOn{
@@ -165,19 +279,6 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
         byteHexString = [@"0" stringByAppendingString:byteHexString];
     }
     return byteHexString;
-}
-
-+ (NSString *)getHeartRateAcquisitionInterval:(fitpolo701HeartRateAcquisitionInterval)intervalType{
-    switch (intervalType) {
-        case fitpolo701HeartRateAcquisitionIntervalClose:
-            return @"00";
-        case fitpolo701HeartRateAcquisitionInterval10Min:
-            return @"01";
-        case fitpolo701HeartRateAcquisitionInterval20Min:
-            return @"02";
-        case fitpolo701HeartRateAcquisitionInterval30Min:
-            return @"03";
-    }
 }
 
 + (NSString *)getScreenDisplay:(fitpolo701ScreenDisplayModel *)displayModel{
@@ -275,6 +376,19 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
                                                        options:kNilOptions
                                                          range:NSMakeRange(0, uuid.length)];
     return (numberOfMatches > 0);
+}
+
++ (BOOL)checkIdenty:(NSString *)identy{
+    if ([self isMacAddressLowFour:identy]) {
+        return YES;
+    }
+    if ([self isUUIDString:identy]) {
+        return YES;
+    }
+    if ([self isMacAddress:identy]) {
+        return YES;
+    }
+    return NO;
 }
 
 + (NSData *)stringToData:(NSString *)dataString{
@@ -508,7 +622,7 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
     NSMutableArray *list = [NSMutableArray array];
     for (NSInteger i = 0; i < 4; i ++) {
         NSString *subContent = [content substringWithRange:NSMakeRange(i * 8, 8)];
-        if (![subContent isEqualToString:@"00000000"]) {
+        if (![[subContent substringWithRange:NSMakeRange(2, 2)] isEqualToString:@"00"]) {
             //@"00000000"此类闹钟属于无效数据
             fitpolo701AlarmClockModel *clockModel = [[fitpolo701AlarmClockModel alloc] init];
             clockModel.clockType = [self getClockType:[subContent substringWithRange:NSMakeRange(0, 2)]];
@@ -538,28 +652,6 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
     return [resultArray copy];
 }
 
-+ (fitpolo701ScanModel *)getModelWithParamDic:(NSDictionary *)paramDic peripheral:(CBPeripheral *)peripheral{
-    if (!paramDic || paramDic.allValues.count == 0 || !peripheral) {
-        return nil;
-    }
-    NSData *data = paramDic[CBAdvertisementDataManufacturerDataKey];
-    if (data.length != 9) {
-        return nil;
-    }
-    NSString *temp = data.description;
-    temp = [temp stringByReplacingOccurrencesOfString:@" " withString:@""];
-    temp = [temp stringByReplacingOccurrencesOfString:@"<" withString:@""];
-    temp = [temp stringByReplacingOccurrencesOfString:@">" withString:@""];
-    NSString *macAddress = [NSString stringWithFormat:@"%@-%@-%@-%@-%@-%@",[temp substringWithRange:NSMakeRange(0, 2)],[temp substringWithRange:NSMakeRange(2, 2)],[temp substringWithRange:NSMakeRange(4, 2)],[temp substringWithRange:NSMakeRange(6, 2)],[temp substringWithRange:NSMakeRange(8, 2)],[temp substringWithRange:NSMakeRange(10, 2)]];
-    NSString *deviceType = [temp substringWithRange:NSMakeRange(12, 2)];
-    fitpolo701ScanModel *model = [[fitpolo701ScanModel alloc] init];
-    model.peripheral = peripheral;
-    model.macAddress = macAddress;
-    model.peripheralName = paramDic[CBAdvertisementDataLocalNameKey];
-    model.typeIdenty = deviceType;
-    return model;
-}
-
 + (NSDictionary *)getSedentaryRemindData:(NSString *)content{
     BOOL isOn = [[content substringWithRange:NSMakeRange(0, 2)] isEqualToString:@"01"];
     NSString *startHour = [self getDecimalStringWithHex:content range:NSMakeRange(2, 2)];
@@ -580,7 +672,7 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
     NSString *timeFormat = [content substringWithRange:NSMakeRange(2, 2)];
     fitpolo701ScreenDisplayModel *displayModel = [self getScreenDisplayModelWithContent:[content substringWithRange:NSMakeRange(4, 2)]];
     BOOL remindLastScreenDisplay = [[content substringWithRange:NSMakeRange(6, 2)] isEqualToString:@"01"];
-    NSString *heartRateAcquisitionInterval = @"00";
+    NSString *heartRateAcquisitionInterval = @"0";
     NSString *tempHeart = [content substringWithRange:NSMakeRange(8, 2)];
     if ([tempHeart isEqualToString:@"01"]) {
         heartRateAcquisitionInterval = @"10";
@@ -656,6 +748,8 @@ static NSString *const uuidPatternString = @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4
             return @"请求久坐提醒数据";
         case fitpolo701GetConfigurationParametersOperation:
             return @"请求设备配置参数";
+        case fitpolo701DefaultTaskOperationID:
+            return @"";
     }
 }
 

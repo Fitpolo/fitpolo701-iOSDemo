@@ -8,13 +8,10 @@
 
 #import "fitpolo701UpgradeManager.h"
 #import <objc/message.h>
-#import "fitpolo701StatusMonitoringManager.h"
-#import "fitpolo701PeripheralManager.h"
 #import "fitpolo701Defines.h"
 #import "fitpolo701CentralManager.h"
-#import "fitpolo701Parser.h"
 #import "fitpolo701LogManager.h"
-#import "fitpolo701Interface+Update.h"
+#import "fitpolo701Parser.h"
 
 @interface fitpolo701UpgradeManager()
 
@@ -37,8 +34,6 @@
  当前升级进度
  */
 @property (nonatomic, assign)NSInteger updateIndex;
-
-@property (nonatomic, strong)fitpolo701StatusMonitoringManager *statusManager;
 
 /**
  升级过程中定时发送升级数据包的定时器
@@ -71,31 +66,31 @@
 
 #pragma mark - life circle
 - (void)dealloc{
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:fitpolo701PeripheralUpdateResultNotification
-                                                  object:nil];
-    NSLog(@"fitpolo701UpgradeManager销毁");
+    NSLog(@"升级中心销毁");
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:fitpolo701PeripheralUpdateResultNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:fitpolo701PeripheralConnectStateChanged object:nil];
 }
 
 - (instancetype)init{
     if (self = [super init]) {
-        [self listenConnectStatus];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(peripheralConnectStateChanged)
+                                                     name:fitpolo701PeripheralConnectStateChanged
+                                                   object:nil];
     }
     return self;
 }
 
 #pragma mark - Private method
-- (void)listenConnectStatus{
-    fitpolo701WS(weakSelf);
-    [self.statusManager startMonitoringConnectStatus:^(fitpolo701ConnectStatus status) {
-        if (status == fitpolo701ConnectStatusDisconnect
-            && weakSelf.switchHighModel) {
-            //由于切换模式造成的断开连接，
-            [weakSelf performSelector:@selector(switchPeripheralToHighSpeedModel)
-                           withObject:nil
-                           afterDelay:5.f];
-        }
-    }];
+- (void)peripheralConnectStateChanged{
+    if ([fitpolo701CentralManager sharedInstance].connectStatus == fitpolo701ConnectStatusDisconnect && self.switchHighModel) {
+        //由于切换模式造成的断开连接，
+        fitpolo701_main_safe(^{
+            [self performSelector:@selector(switchPeripheralToHighSpeedModel)
+                       withObject:nil
+                       afterDelay:5.f];
+        });
+    }
 }
 
 /**
@@ -132,33 +127,19 @@
         || !fitpolo701ValidData(packDic[@"packLenData"])
         || [packDic[@"packLenData"] length] != 4) {
         self.updating = NO;
-        if (self.updateFailedBlock) {
-            fitpolo701_main_safe(^{
-                NSError *error = [[NSError alloc] initWithDomain:@"com.moko.update"
-                                                            code:-111111
-                                                        userInfo:@{@"errorInfo":@"get package error"}];
-                self.updateFailedBlock(error);
-            });
-        }
+        [fitpolo701Parser operationGetPackageDataErrorBlock:self.updateFailedBlock];
         return;
     }
     NSArray *packageList = packDic[@"packageList"];
     if (!fitpolo701ValidArray(packageList)) {
-        fitpolo701_main_safe(^{
-            if (self.updateFailedBlock) {
-                NSError *error = [[NSError alloc] initWithDomain:@"com.moko.update"
-                                                            code:-111111
-                                                        userInfo:@{@"errorInfo":@"get package error"}];
-                self.updateFailedBlock(error);
-            }
-            self.updating = NO;
-        });
+        self.updating = NO;
+        [fitpolo701Parser operationGetPackageDataErrorBlock:self.updateFailedBlock];
         return;
     }
     //一帧一帧发
     self.updateIndex = 0;
     fitpolo701WS(weakSelf);
-    [fitpolo701Interface peripheralStartUpdateWithCrcData:packDic[@"crc16"] packageSize:packDic[@"packLenData"] successBlock:^(id returnData) {
+    [self peripheralStartUpdateWithCrcData:packDic[@"crc16"] packageSize:packDic[@"packLenData"] successBlock:^(id returnData) {
         [weakSelf performSelector:@selector(updateWithPackage:)
                        withObject:packageList
                        afterDelay:1];
@@ -179,15 +160,7 @@
  */
 - (void)updateWithPackage:(NSArray *)packageList{
     if (!fitpolo701ValidArray(packageList)) {
-        fitpolo701_main_safe(^{
-            self.updating = NO;
-            if (self.updateFailedBlock) {
-                NSError *error = [[NSError alloc] initWithDomain:@"com.moko.update"
-                                                            code:-111111
-                                                        userInfo:@{@"errorInfo":@"get package error"}];
-                self.updateFailedBlock(error);
-            }
-        });
+        [fitpolo701Parser operationGetPackageDataErrorBlock:self.updateFailedBlock];
         return;
     }
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -220,12 +193,7 @@
                 weakSelf.updateIndex = 0;
                 weakSelf.updating = NO;
                 //移除升级结果监听
-                if (weakSelf.updateFailedBlock) {
-                    NSError *error = [[NSError alloc] initWithDomain:@"com.moko.update"
-                                                                code:-111111
-                                                            userInfo:@{@"errorInfo":@"Update failed"}];
-                    weakSelf.updateFailedBlock(error);
-                }
+                [fitpolo701Parser operationUpdateErrorBlock:self.updateFailedBlock];
             });
             return ;
         }
@@ -257,14 +225,7 @@
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:fitpolo701PeripheralUpdateResultNotification
                                                       object:nil];
-        fitpolo701_main_safe(^{
-            if (weakSelf.updateFailedBlock) {
-                NSError *error = [[NSError alloc] initWithDomain:@"com.moko.update"
-                                                            code:-111111
-                                                        userInfo:@{@"errorInfo":@"update timeout"}];
-                weakSelf.updateFailedBlock(error);
-            }
-        });
+        [fitpolo701Parser operationUpdateErrorBlock:self.updateFailedBlock];
     });
     dispatch_resume(self.resultTimer);
 }
@@ -284,7 +245,7 @@
         || !fitpolo701ValidData(packageData)) {
         return NO;
     }
-    if (self.statusManager.connectStatus != fitpolo701ConnectStatusConnected) {
+    if ([fitpolo701CentralManager sharedInstance].connectStatus != fitpolo701ConnectStatusConnected) {
         //连接状态不可用，则直接发送失败
         return NO;
     }
@@ -292,7 +253,7 @@
     NSMutableData *sendData = [NSMutableData dataWithData:headerData];
     [sendData appendData:frameIndexData];
     [sendData appendData:packageData];
-    return [[fitpolo701CentralManager sharedInstance].peripheralManager sendUpdateData:sendData];
+    return [[fitpolo701CentralManager sharedInstance] sendUpdateData:sendData];
 }
 
 - (NSData *) setId:(NSInteger)Id {
@@ -394,24 +355,52 @@
         }
         self.updateIndex = 0;
         self.updating = NO;
-        if (self.updateFailedBlock) {
-            NSString *errorInfo = @"get package error";
-            //@"01"超时@"02"校验码错误@"03"文件错误
-            if ([resultString isEqualToString:@"01"]) {
-                errorInfo = @"update timeout";
-            }else if ([resultString isEqualToString:@"02"]){
-                errorInfo = @"crc error";
-            }else if ([resultString isEqualToString:@"03"]){
-                errorInfo = @"package error";
-            }
-            fitpolo701_main_safe(^{
+        NSString *errorInfo = @"get package error";
+        //@"01"超时@"02"校验码错误@"03"文件错误
+        if ([resultString isEqualToString:@"01"]) {
+            errorInfo = @"update timeout";
+        }else if ([resultString isEqualToString:@"02"]){
+            errorInfo = @"crc error";
+        }else if ([resultString isEqualToString:@"03"]){
+            errorInfo = @"package error";
+        }
+        fitpolo701_main_safe(^{
+            if (self.updateFailedBlock) {
                 NSError *error = [[NSError alloc] initWithDomain:@"com.moko.update"
                                                             code:-111111
                                                         userInfo:@{@"errorInfo":errorInfo}];
                 self.updateFailedBlock(error);
-            });
-        }
+            }
+        });
     });
+}
+
+/**
+ 手环开启升级固件
+ 
+ @param crcData 本地升级的校验码，两个字节，将本地的固件做crc16得出来的
+ @param packageSize 本次升级的固件大小，4个字节
+ @param successBlock 成功回调
+ @param failedBlock 失败回调
+ */
+- (void)peripheralStartUpdateWithCrcData:(NSData *)crcData
+                             packageSize:(NSData *)packageSize
+                            successBlock:(fitpolo701CommunicationSuccessBlock)successBlock
+                             failedBlock:(fitpolo701CommunicationFailedBlock)failedBlock{
+    if (!fitpolo701ValidData(crcData) || !fitpolo701ValidData(packageSize)) {
+        [fitpolo701Parser operationParamsErrorBlock:failedBlock];
+        return;
+    }
+    NSData *headerData = [fitpolo701Parser stringToData:@"28"];
+    NSMutableData *commandData = [NSMutableData dataWithData:headerData];
+    [commandData appendData:crcData];
+    [commandData appendData:packageSize];
+    NSString *commandString = [fitpolo701Parser hexStringFromData:commandData];
+    [[fitpolo701CentralManager sharedInstance] addTaskWithTaskID:fitpolo701StartUpdateOperation
+                                                        resetNum:NO
+                                                     commandData:commandString
+                                                    successBlock:successBlock
+                                                    failureBlock:failedBlock];
 }
 
 #pragma mark - Public method
@@ -430,19 +419,12 @@
     NSAssert(successBlock != nil, @"If you need to update, the successBlock can not be nil");
     NSAssert(failedBlock != nil, @"If you need to update, the failedBlock can not be nil");
     if (!fitpolo701ValidData(packageData)) {
-        if (failedBlock) {
-            fitpolo701_main_safe(^{
-                NSError *error = [[NSError alloc] initWithDomain:@"com.moko.update"
-                                                            code:-111111
-                                                        userInfo:@{@"errorInfo":@"get package error"}];
-                failedBlock(error);
-            });
-        }
+        [fitpolo701Parser operationGetPackageDataErrorBlock:failedBlock];
         return;
     }
-    CBPeripheral *peripheral = [fitpolo701CentralManager sharedInstance].peripheralManager.connectedPeripheral;
+    CBPeripheral *peripheral = [fitpolo701CentralManager sharedInstance].connectedPeripheral;
     if (!peripheral) {
-        fitpolo701ConnectError(failedBlock);
+        [fitpolo701Parser operationDisconnectedErrorBlock:failedBlock];
         return;
     }
     self.peripheral = nil;
@@ -460,12 +442,5 @@
     [[fitpolo701CentralManager sharedInstance] disconnectConnectedPeripheral];
 }
 
-#pragma mark - setter & getter
-- (fitpolo701StatusMonitoringManager *)statusManager{
-    if (!_statusManager) {
-        _statusManager = [fitpolo701StatusMonitoringManager new];
-    }
-    return _statusManager;
-}
-
 @end
+

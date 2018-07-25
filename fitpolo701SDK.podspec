@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/Fitpolo/fitpolo701-iOSDemo.git", :tag => "#{s.version}" }         #存储库的git地址，以及tag值
   s.requires_arc = true #是否支持ARC
 
-  s.source_files = "fitpolo701SDK/**/*"
+  s.source_files = "fitpolo701SDK/*.{h,m}"
 
   #s.dependency "Masonry", "~> 1.0.0"    #所依赖的第三方库，没有就不用写
 

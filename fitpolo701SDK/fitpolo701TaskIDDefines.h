@@ -1,5 +1,6 @@
 
 typedef NS_ENUM(NSInteger, fitpolo701TaskOperationID) {
+    fitpolo701DefaultTaskOperationID,            //默认指令
     fitpolo701VibrationOperation,                //震动指令
     fitpolo701SetUnitOperation,                  //切换进制单位
     fitpolo701OpenANCSOperation,                 //开启ancs

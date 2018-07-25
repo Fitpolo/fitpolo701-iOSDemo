@@ -7,10 +7,9 @@
 //
 
 #import "fitpolo701TaskOperation.h"
+#import "fitpolo701Defines.h"
 #import "fitpolo701DataParser.h"
-#import "fitpolo701RegularsDefine.h"
-#import "fitpolo701CentralManager.h"
-#import "fitpolo701PeripheralManager.h"
+#import "fitpolo701Parser.h"
 
 NSString *const fitpolo701AdditionalInformation = @"fitpolo701AdditionalInformation";
 NSString *const fitpolo701DataInformation = @"fitpolo701DataInformation";
@@ -46,9 +45,9 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
 /**
  线程结束时候的回调
  */
-@property (nonatomic, copy)communicationCompleteBlock completeBlock;
+@property (nonatomic, copy)void (^completeBlock) (NSError *error, fitpolo701TaskOperationID operationID, id returnData);
 
-@property (nonatomic, copy)communicationCommandBlock commandBlock;
+@property (nonatomic, copy)void (^commandBlock)(void);
 
 @property (nonatomic, strong)NSMutableArray *dataList;
 
@@ -61,11 +60,6 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
  接受数据超时个数
  */
 @property (nonatomic, assign)NSInteger receiveTimerCount;
-
-/**
- 只有添加了监听的operation才需要移除监听
- */
-@property (nonatomic, assign)BOOL shouldRemoveObser;
 
 /**
  是否需要改变目标数据条数
@@ -97,12 +91,6 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
 
 - (void)dealloc{
     NSLog(@"任务销毁");
-    if (!self.shouldRemoveObser) {
-        return;
-    }
-    [[fitpolo701CentralManager sharedInstance].peripheralManager.dataParser removeObserver:self
-                                                                                forKeyPath:@"dataList"
-                                                                                   context:nil];
 }
 
 /**
@@ -116,14 +104,12 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
  */
 - (instancetype)initOperationWithID:(fitpolo701TaskOperationID)operationID
                            resetNum:(BOOL)resetNum
-                       commandBlock:(communicationCommandBlock)commandBlock
-                      completeBlock:(communicationCompleteBlock)completeBlock{
+                       commandBlock:(void (^)(void))commandBlock
+                      completeBlock:(void (^)(NSError *error, fitpolo701TaskOperationID operationID, id returnData))completeBlock{
     if (self = [super init]) {
         _executing = NO;
         _finished = NO;
-        _completeBlock = nil;
         _completeBlock = completeBlock;
-        _commandBlock = nil;
         _commandBlock = commandBlock;
         _operationID = operationID;
         _respondNumber = 1;
@@ -158,69 +144,22 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
     [self didChangeValueForKey:@"isExecuting"];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
-    if (self.isCancelled
-        || object != [fitpolo701CentralManager sharedInstance].peripheralManager.dataParser
-        || ![keyPath isEqualToString:@"dataList"]
-        || !_executing) {
+#pragma mark - CBPeripheralDelegate
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    if (error) {
+        NSLog(@"read data from peripheral error:%@", [error localizedDescription]);
         return;
     }
-    NSArray *list = change[@"new"];
-    if (!list || list.count != 1) {
+    if (self.isCancelled || !_executing) {
         return;
     }
-    fitpolo701ParseResultModel *model = list[0];
-    if (self.timeout
-        || !model
-        || model.operationID != self.operationID
-        || !model.returnData) {
+    NSString *readData = [fitpolo701Parser hexStringFromData:characteristic.value];
+    NSDictionary *dic = [fitpolo701DataParser parseReadData:readData];
+    if (!fitpolo701ValidDict(dic)) {
         return;
     }
-    NSDictionary *dic = model.returnData;
-    if (!dic) {
-        return;
-    }
-    NSString *numString = dic[fitpolo701CommunicationDataNum];
-    if (fitpolo701ValidStr(numString)) {
-        //本条数据是总数信息
-        if (!self.needResetNum || self.hasReceive) {
-            return;
-        }
-        //如果需要拿总条数，则总条数必须在正式的数据到来之前到达，否则认为出错
-        if (self.dataList.count != 0) {
-            //接受数据异常
-            return;
-        }
-        //认为接受数据总条数成功
-        self.respondNumber = [numString integerValue];
-        self.additionalInformation = dic;
-        //已经接受了个数信息，再有新的个数信息到来，直接过滤
-        self.hasReceive = YES;
-        if (self.respondNumber == 0) {
-            //如果没有数据，则直接认为通信成功
-            [self communicationSuccess];
-            return;
-        }
-        if (self.numTaskTimer) {
-            //关闭总数接受定时器
-            dispatch_cancel(self.numTaskTimer);
-        }
-        //开启接受超时定时器
-        [self startReceiveTimer:NO];
-        return;
-    }
-    if (self.needResetNum && !self.hasReceive) {
-        //需要从外设拿数据总条数的情况下，如果数据先于数据到来，不接收
-        return;
-    }
-    self.receiveTimerCount = 0;
-    if (self.timeout) {
-        return;
-    }
-    [self.dataList addObject:model.returnData];
-    if (self.dataList.count == self.respondNumber) {
-        [self communicationSuccess];
-    }
+    [self dataParserReceivedData:dic];
 }
 
 #pragma mark - Private method
@@ -231,12 +170,6 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
     if (self.commandBlock) {
         self.commandBlock();
     }
-    [[fitpolo701CentralManager sharedInstance].peripheralManager.dataParser addObserver:self
-                                                                             forKeyPath:@"dataList"
-                                                                                options:NSKeyValueObservingOptionNew
-                                                                                context:nil];
-    //需要在销毁的时候移除监听
-    self.shouldRemoveObser = YES;
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     __weak __typeof(&*self)weakSelf = self;
     //需要从外设拿当前通信的总条数
@@ -264,7 +197,7 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
 
 /**
  如果需要从外设拿总条数，则在拿到总条数之后，开启接受超时定时器，开启定时器的时候已经设置了当前线程的生命周期，所以不需要重新beforeDate了。如果是直接开启的接收超时定时器，这个时候需要控制当前线程的生命周期
-
+ 
  @param setRunloopLifeCircle YES:需要设置当前线程的生命周期,NO:不需要设置
  */
 - (void)startReceiveTimer:(BOOL)setRunloopLifeCircle{
@@ -272,9 +205,10 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     self.receiveTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
     //当2s内没有接收到新的数据的时候，也认为是接受超时
-    dispatch_source_set_timer(self.receiveTimer, dispatch_walltime(NULL, 0), 0.2 * NSEC_PER_SEC, 0);
+    dispatch_source_set_timer(self.receiveTimer, dispatch_walltime(NULL, 0), 0.1 * NSEC_PER_SEC, 0);
+    NSInteger timeout = MAX(self.receiveTimeout, 2);
     dispatch_source_set_event_handler(self.receiveTimer, ^{
-        if (weakSelf.timeout || weakSelf.receiveTimerCount >= 10) {
+        if (weakSelf.timeout || weakSelf.receiveTimerCount >= (10 * timeout)) {
             //接受数据超时
             weakSelf.receiveTimerCount = 0;
             [weakSelf communicationTimeout];
@@ -328,7 +262,10 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
             }
             return;
         }
-        self.completeBlock([self getErrorWithMsg:@"Communication timeout"], self.operationID, nil);
+        NSError *error = [[NSError alloc] initWithDomain:@"com.moko.operationError"
+                                                    code:-999
+                                                userInfo:@{@"errorInfo":@"Communication timeout"}];
+        self.completeBlock(error, self.operationID, nil);
     }
 }
 
@@ -363,9 +300,64 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
     _needPartOfData = [need boolValue];
 }
 
-- (NSError *)getErrorWithMsg:(NSString *)msg{
-    NSError *error = [[NSError alloc] initWithDomain:@"com.moko.operationError" code:-999 userInfo:@{@"errorInfo":msg}];
-    return error;
+- (void)dataParserReceivedData:(NSDictionary *)dataDic{
+    if (self.isCancelled || !_executing || !fitpolo701ValidDict(dataDic)) {
+        return;
+    }
+    fitpolo701TaskOperationID operationID = [dataDic[@"operationID"] integerValue];
+    if (operationID == fitpolo701DefaultTaskOperationID) {
+        return;
+    }
+    NSDictionary *returnData = dataDic[@"returnData"];
+    if (self.timeout
+        || !returnData
+        || operationID != self.operationID) {
+        return;
+    }
+    if (!returnData) {
+        return;
+    }
+    NSString *numString = returnData[fitpolo701CommunicationDataNum];
+    if (fitpolo701ValidStr(numString)) {
+        //本条数据是总数信息
+        if (!self.needResetNum || self.hasReceive) {
+            return;
+        }
+        //如果需要拿总条数，则总条数必须在正式的数据到来之前到达，否则认为出错
+        if (self.dataList.count != 0) {
+            //接受数据异常
+            return;
+        }
+        //认为接受数据总条数成功
+        self.respondNumber = [numString integerValue];
+        self.additionalInformation = returnData;
+        //已经接受了个数信息，再有新的个数信息到来，直接过滤
+        self.hasReceive = YES;
+        if (self.respondNumber == 0) {
+            //如果没有数据，则直接认为通信成功
+            [self communicationSuccess];
+            return;
+        }
+        if (self.numTaskTimer) {
+            //关闭总数接受定时器
+            dispatch_cancel(self.numTaskTimer);
+        }
+        //开启接受超时定时器
+        [self startReceiveTimer:NO];
+        return;
+    }
+    if (self.needResetNum && !self.hasReceive) {
+        //需要从外设拿数据总条数的情况下，如果数据先于数据到来，不接收
+        return;
+    }
+    self.receiveTimerCount = 0;
+    if (self.timeout) {
+        return;
+    }
+    [self.dataList addObject:returnData];
+    if (self.dataList.count == self.respondNumber) {
+        [self communicationSuccess];
+    }
 }
 
 #pragma mark - setter & getter
@@ -389,3 +381,5 @@ NSString *const fitpolo701DataStatusLev = @"fitpolo701DataStatusLev";
 }
 
 @end
+
+

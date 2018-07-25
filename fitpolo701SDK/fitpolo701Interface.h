@@ -7,7 +7,41 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "fitpolo701BlockDefine.h"
+#import "fitpolo701CentralManager.h"
+
+typedef NS_ENUM(NSInteger, fitpolo701Unit) {
+    fitpolo701MetricSystem,         //公制
+    fitpolo701Imperial,             //英制
+};
+
+typedef NS_ENUM(NSInteger, fitpolo701Gender) {
+    fitpolo701Male,             //男性
+    fitpolo701Female,           //女性
+};
+
+typedef NS_ENUM(NSInteger, fitpolo701TimeFormat) {
+    fitpolo70124Hour,         //24小时制
+    fitpolo70112Hour,         //12小时制
+};
+
+typedef NS_ENUM(NSInteger, fitpolo701AlarmClockIndex) {
+    fitpolo701AlarmClockIndexFirst,         //第一组闹钟
+    fitpolo701AlarmClockIndexSecond,        //第二组闹钟
+};
+
+typedef NS_ENUM(NSInteger, fitpolo701HeartRateAcquisitionInterval) {
+    fitpolo701HeartRateAcquisitionIntervalClose,    //关闭心率采集功能
+    fitpolo701HeartRateAcquisitionInterval10Min,    //10分钟
+    fitpolo701HeartRateAcquisitionInterval20Min,    //20分钟
+    fitpolo701HeartRateAcquisitionInterval30Min,    //30分钟
+};
+
+typedef NS_ENUM(NSInteger, fitpolo701RequestDataWithTimeStamp) {
+    fitpolo701RequestStepDataWithTimeStamp,         //时间戳请求计步数据
+    fitpolo701RequestSleepIndexDataWithTimeStamp,   //时间戳请求睡眠index数据
+    fitpolo701RequestSleepRecordDataWithTimeStamp,  //时间戳请求睡眠record数据
+    fitpolo701RequestHeartRateDataWithTimeStamp,    //时间戳请求心率数据
+};
 
 @class fitpolo701AncsModel;
 @class fitpolo701AlarmClockModel;

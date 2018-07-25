@@ -8,7 +8,7 @@
 
 #import "fitpolo701LogManager.h"
 #import <objc/runtime.h>
-#import "fitpolo701RegularsDefine.h"
+#import "fitpolo701Defines.h"
 
 static const char *formatterKey = "formatterKey";
 static NSString *const localFileName = @"/HCKCommunicationData.txt";
