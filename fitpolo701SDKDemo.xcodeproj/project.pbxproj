@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		000A38252224F91C00C82948 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 000A38242224F91C00C82948 /* README.md */; };
 		004DEDDD2105C9C7004E5358 /* HCKMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 004DEDDC2105C9C6004E5358 /* HCKMainViewController.m */; };
 		005A29952106C8EA0026804D /* BORD_CC_01.bin in Resources */ = {isa = PBXBuildFile; fileRef = 005A29942106C8EA0026804D /* BORD_CC_01.bin */; };
 		005A2A402107225E0026804D /* CBPeripheral+fitpolo701Characteristic.m in Sources */ = {isa = PBXBuildFile; fileRef = 005A2A2A2107225D0026804D /* CBPeripheral+fitpolo701Characteristic.m */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		000A38242224F91C00C82948 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		004DEDDB2105C9C6004E5358 /* HCKMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HCKMainViewController.h; sourceTree = "<group>"; };
 		004DEDDC2105C9C6004E5358 /* HCKMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HCKMainViewController.m; sourceTree = "<group>"; };
 		005A29942106C8EA0026804D /* BORD_CC_01.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = BORD_CC_01.bin; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 		00BCFCCA20B4F56C000B7640 = {
 			isa = PBXGroup;
 			children = (
+				000A38242224F91C00C82948 /* README.md */,
 				005A2A282107225D0026804D /* fitpolo701SDK */,
 				00BCFCD520B4F56C000B7640 /* fitpolo701SDKDemo */,
 				00BCFCD420B4F56C000B7640 /* Products */,
@@ -195,6 +198,7 @@
 			files = (
 				005A29952106C8EA0026804D /* BORD_CC_01.bin in Resources */,
 				00BCFCE020B4F56C000B7640 /* Assets.xcassets in Resources */,
+				000A38252224F91C00C82948 /* README.md in Resources */,
 				00BCFD3120B50022000B7640 /* BORD_EE_01.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

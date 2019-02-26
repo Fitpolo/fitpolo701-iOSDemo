@@ -147,7 +147,7 @@ static NSString *const mainCellIdenty = @"mainCellIdenty";
 - (void)buttonPressed{
     [[fitpolo701CentralManager sharedInstance] startScanPeripheral];
     fitpolo701WS(weakSelf);
-    [[fitpolo701CentralManager sharedInstance] connectPeripheralWithIdentifier:@"0C-8D" connectSuccessBlock:^(CBPeripheral *connectedPeripheral, NSString *macAddress, NSString *peripheralName) {
+    [[fitpolo701CentralManager sharedInstance] connectPeripheralWithIdentifier:@"98-49" connectSuccessBlock:^(CBPeripheral *connectedPeripheral, NSString *macAddress, NSString *peripheralName) {
         [weakSelf showAlertWithMsg:@"连接成功"];
     } connectFailBlock:^(NSError *error) {
         [weakSelf showAlertWithMsg:error.userInfo[@"errorInfo"]];
